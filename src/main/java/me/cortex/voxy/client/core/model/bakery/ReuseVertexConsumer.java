@@ -7,6 +7,7 @@ import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.MipmapStrategy;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.core.Direction;
 import org.lwjgl.system.MemoryUtil;
 
 public final class ReuseVertexConsumer implements VertexConsumer {
@@ -83,6 +84,11 @@ public final class ReuseVertexConsumer implements VertexConsumer {
     }
 
     @Override
+    public ReuseVertexConsumer setUv3(float u, float v) {
+        return this;
+    }
+
+    @Override
     public ReuseVertexConsumer setNormal(float x, float y, float z) {
         return this;
     }
@@ -104,7 +110,8 @@ public final class ReuseVertexConsumer implements VertexConsumer {
     }
 
     public ReuseVertexConsumer quad(BakedQuad quad, int metadata) {
-        this.anyShaded |= quad.materialInfo().shade();
+        // 26.3 uses an UP lighting override for the old full-bright, unshaded faces.
+        this.anyShaded |= quad.materialInfo().shadeDirectionOverride() != Direction.UP;
         this.anyDarkendTex |= quad.materialInfo().sprite().contents().mipmapStrategy == MipmapStrategy.DARK_CUTOUT;
         this.ensureCanPut();
         for (int i = 0; i < 4; i++) {

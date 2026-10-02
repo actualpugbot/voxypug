@@ -1,5 +1,6 @@
 package me.cortex.voxy.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.cortex.voxy.client.core.gl.Capabilities;
 import me.cortex.voxy.client.core.rendering.util.SharedIndexBuffer;
 import me.cortex.voxy.common.Logger;
@@ -21,6 +22,11 @@ public class VoxyClient implements ClientModInitializer {
     private static final HashSet<String> FREX = new HashSet<>();
     private static FileLock EXCLUSIVE_LOCK;
     public static void initVoxyClient() {
+        if (!"OpenGL".equalsIgnoreCase(RenderSystem.getDevice().getDeviceInfo().backendName())) {
+            Logger.error("Voxy requires the OpenGL graphics backend. Select OpenGL in Minecraft's video settings and restart the game.");
+            return;
+        }
+
         Capabilities.init();//Ensure clinit is called
 
         if (Capabilities.INSTANCE.hasBrokenDepthSampler) {
